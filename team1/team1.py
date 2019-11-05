@@ -53,7 +53,7 @@ def get_direction(a, b):
 def get_distance(a, b):
     return math.hypot(a['x'] - b['x'], a['y'] - b['y'])
 
-def pg_on_line(ap, bp, cp, er=10):
+def pg_on_line(ap, bp, cp, er=11):
     x1, y1 = ap["x"], ap["y"]
     x2, y2 = bp["x"], bp["y"]
     x3, y3 = cp["x"], cp["y"]
@@ -78,7 +78,7 @@ def pg_on_line(ap, bp, cp, er=10):
             return True
     return False
 
-def non_of_enemies_on_line(ap, bp, enemies, er=10):
+def non_of_enemies_on_line(ap, bp, enemies, er=11):
     for i in enemies:
         if pg_on_line(ap, bp, i, er):
             return False
@@ -201,21 +201,25 @@ def play(red_players, blue_players, red_score, blue_score, ball, time_passed):
                     kick(decisions, i, get_direction(p, enemie_goal_min), 60)
                 elif dmax <= distance_from_goal and non_of_enemies_on_line(p, enemie_goal_max, enemies):
                     kick(decisions, i, get_direction(p, enemie_goal_max), 60)
-                # non of them are good to go through so we will pass the ball or 
+                # non of them are good to go through so we will pass the ball or ...
                 else:
                     j = search_for_good_teammate(players, enemies, i, ball, not_lis=[0, 1, 2])
                     pj = players[j]
                     # the best guy to pass the ball is behind us... 
                     # we can do nothing except from...
                     # attack through inside the enemies goal like a bull(the cow)!
-                    if pj['x'] < p['x']:
+                    if pj['x'] <= p['x']:
                         pos = go_poses[i]
                         l = [dmean, dmin, dmax]
                         index = min_index(l)+3
                         npos = go_poses[index]
                         if non_of_enemies_on_line(p, npos, enemies):
-                           pos = npos
-                        move(decisions, i, pos, 18)
+                           move(decisions, i, npos, 18)
+                        elif non_of_enemies_on_line(p, pos, enemies): # pass the ball
+                            move(decisions, i, pos, 18)
+                        else:
+                            d = get_distance(p, pj)
+                            kick(decisions, i, get_direction(p, pj), min(d, 60))
                     else: # pass the ball
                         d = get_distance(p, pj)
                         kick(decisions, i, get_direction(p, pj), min(d, 60))
