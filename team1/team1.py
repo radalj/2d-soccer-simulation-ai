@@ -53,7 +53,7 @@ def get_direction(a, b):
 def get_distance(a, b):
     return math.hypot(a['x'] - b['x'], a['y'] - b['y'])
 
-def pg_on_line(ap, bp, cp, er=11):
+def pg_on_line(ap, bp, cp, er=5):
     x1, y1 = ap["x"], ap["y"]
     x2, y2 = bp["x"], bp["y"]
     x3, y3 = cp["x"], cp["y"]
@@ -78,8 +78,13 @@ def pg_on_line(ap, bp, cp, er=11):
             return True
     return False
 
-def non_of_enemies_on_line(ap, bp, enemies, er=11):
+def non_of_enemies_on_line(ap, bp, enemies, er=None):
     for i in enemies:
+        if er == None: # means that we should find the error ourselves
+            er = 5
+            if i["number"] == 0:
+                er = 7.5
+            er += 4
         if pg_on_line(ap, bp, i, er):
             return False
     return True
@@ -120,8 +125,8 @@ def play(red_players, blue_players, red_score, blue_score, ball, time_passed):
     players = red_players
     enemies = blue_players
     enemie_goal_mean = {'x' : 484, 'y' : 0}
-    enemie_goal_min  = {'x' : 484, 'y' : -90}
-    enemie_goal_max  = {'x' : 484, 'y' : 90}
+    enemie_goal_min  = {'x' : 484, 'y' : -80}
+    enemie_goal_max  = {'x' : 484, 'y' : 80}
     ball_color = ball["owner_color"]
     ball_number = ball["owner_number"]
     ball_x = ball['x']
@@ -235,6 +240,5 @@ def play(red_players, blue_players, red_score, blue_score, ball, time_passed):
         else: # we don't have the ball
             move(decisions, i, ball, 18)
             grab(decisions, i)
-
     ######################################################################################
     return decisions
